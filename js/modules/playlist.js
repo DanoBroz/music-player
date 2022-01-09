@@ -1,11 +1,12 @@
 import { songsList } from '../data/songs.js';
+import PlayInfo from './play-info.js'
+import Trackbar from './track-bar.js';
 
 const Playlist = (_ => {
 
   const songs = songsList;
   let currentlyPlayingIndex = 0;
   const currentSong = new Audio(songs[currentlyPlayingIndex].url);
-  let isPlaying = false;
 
   const playlistEl = document.querySelector('.playlist');
 
@@ -13,6 +14,15 @@ const Playlist = (_ => {
   const init = _ => {
     render();
     listeners();
+    PlayInfo.setState({
+      songsLength: songs.length,
+      isPlaying: !currentSong.paused,
+    })
+  }
+
+  const flip = _ => {
+    togglePlayPause();
+    render();
   }
 
   const changeAudioSrc = _ => {
@@ -31,6 +41,11 @@ const Playlist = (_ => {
       changeAudioSrc();
       togglePlayPause();
     }
+
+    PlayInfo.setState({
+      songsLength: songs.length,
+      isPlaying: !currentSong.paused,
+    })
   }
 
   const playNext = _ => {
@@ -50,6 +65,10 @@ const Playlist = (_ => {
         mainPlay(listElIndex);
         render();
       }
+    })
+
+    currentSong.addEventListener('timeupdate', _ => {
+      Trackbar.setState(currentSong);
     })
 
     currentSong.addEventListener('ended', _ => {
@@ -88,7 +107,7 @@ const Playlist = (_ => {
     playlistEl.innerHTML = markup;
   }
 
-  return { init }
+  return { init, flip }
 })();
 
 export default Playlist
